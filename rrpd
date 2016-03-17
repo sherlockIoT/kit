@@ -1,0 +1,96 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          rrp deamon
+# Required-Start:    $local_fs $network $syslog
+# Required-Stop:     $local_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: rrp deamon starts the game
+# Description:       starts the game after raspberry pi boot up is complete
+### END INIT INFO
+PATH=${PATH}:/usr/local/bin:/usr/bin
+RRP_PROCESS=/opt/RRP/main.sh
+
+process_details()
+{
+	RRP_PROCESS_COUNT=`ps auxwww|grep -v grep|grep ${RRP_PROCESS}|wc -l`
+	RRP_PROCESS_PID=`ps auxwww|grep -v grep|grep ${RRP_PROCESS}|awk '{print $2}'`
+}
+
+do_start()
+{
+	process_details
+	if [ ${RRP_PROCESS_COUNT} -eq 0 ]; then
+		/bin/bash ${RRP_PROCESS} > /dev/null 2>&1 &
+		sleep 1
+		process_details
+		echo "RRPD PROCESS with PID ${RRP_PROCESS_PID}"
+	else
+		echo "RRPD PROCESS is already running with PID ${RRP_PROCESS_PID}"
+	fi
+}
+
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+	process_details
+	if [ ${RRP_PROCESS_COUNT} -gt 0 ]; then
+		for i in $(seq 1 ${RRP_PROCESS_COUNT})
+		do
+			process_details
+			kill -9 ${RRP_PROCESS_PID} > /dev/null 2>&1
+			sleep 0.5
+		done
+	fi
+	process_details
+	if [ ${RRP_PROCESS_COUNT} -gt 0 ]; then
+		echo "RRPD PROCESS is still running"
+	else 
+		echo "RRPD PROCESS terminated"
+	fi
+}
+
+#
+# Function that sends a SIGHUP to the daemon/service
+#
+do_reload() {
+	do_stop
+	sleep 2
+	do_start
+}
+
+do_status() {
+	process_details
+	if [ ${RRP_PROCESS_COUNT} -gt 0 ]; then
+		for i in $(seq 1 ${RRP_PROCESS_COUNT})
+		do
+			process_details
+			echo "RRPD PROCESS is active with PID: ${RRP_PROCESS_PID}"
+		done
+	else
+			echo "RRPD PROCESS is not active"
+	fi
+}
+
+case "$1" in
+  start)
+	do_start
+	;;
+  stop)
+	do_stop
+	;;
+  status)
+	do_status
+	;;
+  restart|reload)
+	do_reload
+	;;
+  *)
+	echo "Usage: rrpd {start|stop|status|restart}" >&2
+	exit 3
+	;;
+esac
+
+:

@@ -1,0 +1,14 @@
+{
+  "name": "Sherlock-RaspberryPi",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node main"
+  },
+  "dependencies": {
+    "bleacon": "*",
+    "cloudant" : "*",
+    "omx-manager" : "*",
+    "rpi-gpio" : "*"
+  }
+}

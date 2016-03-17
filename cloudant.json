@@ -1,0 +1,7 @@
+{ 
+ "cloudantConfig" : {
+  "user" : "52e82855-9a22-41a2-a1f4-327c8ffc8815-bluemix",
+  "password" : "a003e35cafcf2b1e827f93f1dec1f7fc0199bcde9577c7defc23414c939c1ba9",
+  "dbName" : "rrpmasterdataclone"
+ }
+}
